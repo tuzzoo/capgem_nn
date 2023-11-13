@@ -50,3 +50,8 @@ variable "svcplansku" {
     type = string
     description = "App Service Plan SKU"
 }
+
+variable "fnappname" {
+  type = string
+  description = "Function App name"
+}

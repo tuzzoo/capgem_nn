@@ -52,3 +52,14 @@ module "AppServicePlan" {
   svcplan_rgname = module.ResourceGroup.out_rg_name
   svcplan_sku = var.svcplansku
 }
+
+module "FunctionApp" {
+  source = "./FunctionApp"
+  fnapp_name = "${var.prefix}${var.fnappname}"
+  fnapp_location = var.location
+  fnapp_rgname = module.ResourceGroup.out_rg_name
+  
+  fnapp_strgacc_name = module.StorageAccount.out_strg_acc_name
+  fnapp_strgacc_key = module.StorageAccount.out_strg_acc_key
+  fnapp_svcplan_id = module.AppServicePlan.out_svcplan_id
+}
