@@ -1,6 +1,4 @@
-provider "azurerm" {
-  features {}
-}
+
 
 resource "azurerm_container_registry" "nn_acreg" {
   name                = var.acr_name

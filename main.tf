@@ -20,18 +20,18 @@ locals {
   }
 }
 
-module "resourceGroup" {
+module "ResourceGroup" {
   source = "./ResourceGroup"
   rg_name = "${var.prefix}${var.rgname}" 
   rg_location = "${var.location}"
 }
 
 
-module "containerRegistry" {
+module "ContainerRegistry" {
     source = "./ContainerRegistry"
     acr_name = "${var.prefix}${var.acrname}"     
     acr_location = var.location
-    acr_rg_name = module.resourceGroup.out_rg_name
+    acr_rg_name = module.ResourceGroup.out_rg_name
     acr_sku = var.acrsku
 }
 
@@ -39,8 +39,16 @@ module "StorageAccount" {
   source = "./StorageAccount"
   strgacc_name = "${var.prefix}${var.strgaccname}"
   strgacc_location = var.location
-  strgacc_rgname = module.resourceGroup.out_rg_name
+  strgacc_rgname = module.ResourceGroup.out_rg_name
   strgacc_repltype = var.strgaccrepltype
   strgacc_tier = var.strgacctier
   
+}
+
+module "AppServicePlan" {
+  source = "./AppServicePlan"
+  svcplan_location = var.location
+  svcplan_name = "${var.prefix}${var.svcplanname}"
+  svcplan_rgname = module.ResourceGroup.out_rg_name
+  svcplan_sku = var.svcplansku
 }

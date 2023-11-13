@@ -40,3 +40,13 @@ variable "strgaccrepltype" {
   description = "Storage account replication type"
   //default = "LRS"
 }
+
+variable "svcplanname" {
+  type = string
+  description = "App Service Plan name"
+}
+
+variable "svcplansku" {
+    type = string
+    description = "App Service Plan SKU"
+}
