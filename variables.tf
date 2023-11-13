@@ -22,3 +22,21 @@ variable "acrsku" {
   type = string
   description = "SKU name for ACR"
 }
+
+variable "strgaccname" {
+  type = string
+  description = "Storage account name"
+  //default = "strgacc"
+}
+
+variable "strgacctier" {
+  type = string
+  description = "Storage account Tier"
+  //default = "Standard"
+}
+
+variable "strgaccrepltype" {
+  type = string
+  description = "Storage account replication type"
+  //default = "LRS"
+}
