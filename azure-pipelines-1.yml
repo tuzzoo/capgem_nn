@@ -3,24 +3,99 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-- main
+trigger: none
 
 pool:
   vmImage: ubuntu-latest
 
-steps:
+# Variables covering the backend Azure resources that Terraform requires to store state file.
+# These resources need to be created before the Tarraform plan/apply stage
+variables:
+  tfmstorage-rg: 'cgnn23-tfm-rg'
+  tfmstorage-acc:  'cgnn23tfmstorage01'
+  tfmstorage-container: 'tfstate'
+  tfmstorage-statefile-path: 'tfmpipeline.terraform.tfstate'
 
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+  steps:
 
-- task: TerraformInstaller@1
-  displayName: 'Install Terraform'
-  inputs:
-    terraformVersion: 'latest'  
 
-- script: terraform -version
-  displayName: 'Run a one-line script'
+  - script: |
+      echo Add other tasks to build, test, and deploy your project.
+      echo See https://aka.ms/yaml
+    displayName: 'Run a multi-line script'
+
+    
+
+  - script: terraform -version
+    displayName: 'Run a one-line script'
+
+stages:
+  - stage: TerraformValidate
+    jobs:
+      - job: TfmValidateJob
+        continueOnError: false
+        steps:
+          - task: TerraformInstaller@1
+            displayName: 'Install Terraform'
+            inputs:
+              terraformVersion: 'latest'
+          
+          - script: terraform -version
+            displayName: 'Terraform version'
+
+          - task: TerraformTaskV4@4
+            displayName: "terraform init"
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: '44FWD-Azure-Subscription-ServiceConnection(3fb64972)'
+              backendAzureRmResourceGroupName: '$(tfmstorage-rg)'
+              backendAzureRmStorageAccountName: '$(tfmstorage-acc)'
+              backendAzureRmContainerName: '$(tfmstorage-container)'
+              backendAzureRmKey: '$(tfmstorage-statefile-path)'
+              
+          - task: TerraformTaskV4@4
+            displayName: 'terraform validate'
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+              
+  - stage: TerraformDeploy
+    condition: succeeded('TerraformValidate')
+    dependsOn: TerraformValidate
+    jobs:
+      - job: TfmApplyJob
+        steps:
+          - task: TerraformInstaller@1
+            displayName: 'Install Terraform'
+            inputs:
+              terraformVersion: 'latest'
+          
+          - script: terraform -version
+            displayName: 'Terraform version'
+
+          - task: TerraformTaskV4@4
+            displayName: "terraform init"
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: '44FWD-Azure-Subscription-ServiceConnection(3fb64972)'
+              backendAzureRmResourceGroupName: '$(tfmstorage-rg)'
+              backendAzureRmStorageAccountName: '$(tfmstorage-acc)'
+              backendAzureRmContainerName: '$(tfmstorage-container)'
+              backendAzureRmKey: '$(tfmstorage-statefile-path)'
+
+          - task: TerraformTaskV4@4
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              commandOptions: '-out=tfmain.plan'
+              environmentServiceNameAzureRM: '44FWD-Azure-Subscription-ServiceConnection(3fb64972)'
+          - task: TerraformTaskV4@4
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              commandOptions: '-out=tfmain.plan'
+              environmentServiceNameAzureRM: '44FWD-Azure-Subscription-ServiceConnection(3fb64972)'
+   
