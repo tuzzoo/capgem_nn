@@ -13,8 +13,8 @@ pool:
 variables:
   tfmstorage-rg: 'cgnn23-tfm-rg'
   tfmstorage-acc:  'cgnn23tfmstorage01'
-  tfmstorage-container: 'tfstate'
-  tfmstorage-statefile-path: 'tfmpipeline.terraform.tfstate'
+  tfmstorage-container: 'cgnn23tfstate'
+  tfmstorage-statefile-path: 'tfmpipeline/terraform.tfstate'
 
 
 stages:
