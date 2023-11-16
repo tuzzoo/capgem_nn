@@ -14,7 +14,7 @@ variables:
   tfmstorage-rg: 'cgnn23-tfm-rg'
   tfmstorage-acc:  'cgnn23tfmstorage01'
   tfmstorage-container: 'cgnn23tfstate'
-  tfmstorage-statefile-path: 'tfmpipeline/terraform.tfstate'
+  tfmstorage-key: 'tfmpipeline/terraform.tfstate'
 
 
 stages:
@@ -40,7 +40,7 @@ stages:
               backendAzureRmResourceGroupName: '$(tfmstorage-rg)'
               backendAzureRmStorageAccountName: '$(tfmstorage-acc)'
               backendAzureRmContainerName: '$(tfmstorage-container)'
-              backendAzureRmKey: '$(tfmstorage-statefile-path)'
+              backendAzureRmKey: '$(tfmstorage-key)'
               
           - task: TerraformTaskV4@4
             displayName: 'terraform validate'
@@ -74,7 +74,7 @@ stages:
               backendAzureRmResourceGroupName: '$(tfmstorage-rg)'
               backendAzureRmStorageAccountName: '$(tfmstorage-acc)'
               backendAzureRmContainerName: '$(tfmstorage-container)'
-              backendAzureRmKey: '$(tfmstorage-statefile-path)'
+              backendAzureRmKey: '$(tfmstorage-key)'
 
           - task: TerraformTaskV4@4
             inputs:
