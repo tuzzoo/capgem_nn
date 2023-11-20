@@ -22,6 +22,15 @@ variable "acrsku" {
   type = string
   description = "SKU name for ACR"
 }
+variable "acrimagename" {
+  type = string
+  description = "Name of the container image"
+}
+
+variable "acrimagetag" {
+  type = string
+  description = "Tag of the container image"
+}
 
 variable "strgaccname" {
   type = string
