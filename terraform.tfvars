@@ -8,6 +8,8 @@ rgname = "-rg"
 //Values for ContainerRegistry
 acrname = "registry"
 acrsku = "Basic"
+acrimagename = "tuzzoopythonsamplevscodeflasktutorial"
+acrimagetag = "latest"
 
 //Values for StorageAccount
 strgacctier = "Standard"
@@ -16,7 +18,8 @@ strgaccrepltype = "LRS"
 
 //Values for AppServicePlan
 svcplanname = "svcplan"
-svcplansku = "Y1"
+svcplansku = "EP1"
 
 //Values for  FunctionApp
 fnappname = "fnapp"
+

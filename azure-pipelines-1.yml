@@ -9,7 +9,7 @@ pool:
   vmImage: ubuntu-latest
 
 # Variables covering the backend Azure resources that Terraform requires to store state file.
-# These resources need to be created before the Tarraform plan/apply stage
+# These resources need to be created before the Tarraform init stage
 variables:
   tfmstorage-rg: 'cgnn23-tfm-rg'
   tfmstorage-acc:  'cgnn23tfmstorage01'

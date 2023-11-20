@@ -14,13 +14,13 @@ module "ResourceGroup" {
 }
 
 
-module "ContainerRegistry" {
+/*module "ContainerRegistry" {
     source = "./ContainerRegistry"
     acr_name = "${var.prefix}${var.acrname}"     
     acr_location = var.location
     acr_rg_name = module.ResourceGroup.out_rg_name
     acr_sku = var.acrsku
-}
+} */
 
 module "StorageAccount" {
   source = "./StorageAccount"
@@ -42,6 +42,14 @@ module "AppServicePlan" {
 
 module "FunctionApp" {
   source = "./FunctionApp"
+
+  acr_name = "${var.prefix}${var.acrname}"     
+  acr_location = var.location
+  acr_rg_name = module.ResourceGroup.out_rg_name
+  acr_sku = var.acrsku
+  acr_image_name = var.acrimagename
+  acr_image_tag = var.acrimagetag
+
   fnapp_name = "${var.prefix}${var.fnappname}"
   fnapp_location = var.location
   fnapp_rgname = module.ResourceGroup.out_rg_name
