@@ -55,18 +55,23 @@ There are two yaml pipelines created on Azure DevOps:
 ### Infrastructure deployment  
 
 The Infrastructure Pipeline uses Terraform and azurerm provider to create the following resources:
+
 __1. ResourceGroup__
+
+See Terraform module: ```./ResourceGroup```
 - The cgnn23-rg resource group contains all resources 
 
 __2. Function App__
-See FunctionApp Terraform module: ./FunctionApp
+
+See FunctionApp Terraform module: ```./FunctionApp```
 - The Function App is running the application as container pulled from ContainerRegistry
 - Function App is using System Identity to connect to the ContainerRegistry and StorageAccount (file share)
 - "Continuous Deployment" option is enabled on the FunctionApp, and it listens to events through a Webhook
 - Webhook is used to trigger Funtion App refresh whenever new image version is pushed to the ContainerRegistry
 
 __3. Azure Container Registry__
-Definitions included in the FunctionApp Terraform module: ./FunctionApp
+
+Definitions included in the FunctionApp Terraform module: ```./FunctionApp```
 - The ContainerRegistry is holding images of the application code - the results of build & deployment process implemented in the Application CI/CD Pipeline
 - FunctionApp System Identity is assigned the "AcrPull" role on the ContainerRegistry, so that it can pull application images from the registry. 
 
@@ -75,6 +80,16 @@ The pipeline definition is present in ![](./azure-pipelines-1.yml).
 It can be executed via Azure DevOps and requires Terraform extension to be installed there and a Service Connection to Azure Resource Manager scoped for Subscription added to the Azure DevOps Project Settings. 
 To deploy the infrastructure create/ go to the Azure DevOps pipeline !["Terraform init and apply pipeline"](https://dev.azure.com/tuz-azuretests/NN23%20DAP%20Test%20Assignment/_build?definitionId=34) and trigger it manualy. 
 At the moment event-based triggers are disabled. 
+
+__4. Azure Storage Account__
+
+See Terraform module: ```./StorageAccount```
+- The StorageAccount is required by FunctionApp to keep application files and logs.
+
+__5. Azure App Service Plan__
+
+See Terraform module: ```./ApServicePlan```
+- The AppServicePlan module creates a service plan required by the FunctionApp
 
 
 ### Application code deployment   
