@@ -1,8 +1,15 @@
-# capgem_nn
-#Terraform assignment for NN
+# Terraform assignment for NN 
+Azure Function App from a Docker container, from Python/Linux, deployed with Terraform
 
+- [Terraform assignment for NN](#home)
+  - [Assignment](#assignment)
+  - [Solution architecture](#solution)
+  - [Dependencies and prerequisites](#prereqs)
+  - [Deployment process](#deployment)
+  - [Troubleshooting](#troubleshooting)
 
-##Assignment
+## Assignment 
+
 Here are is a short summary of the assignment and status of each task:
 -1. Write a terraform code that will:
   -  Create an Azure Container Registry  **(DONE)**
@@ -24,25 +31,29 @@ __Advanced Options (optional)__
 - Configure network security groups (NSGs) and virtual network service endpoints (VNETs) to restrict inbound and outbound traffic to the Function App and the Azure Container Registry.   **(TO DO)**
 - Configure retention policies for the Azure Container Registry to manage the lifecycle of Docker images and optimise storage costs.  **(TO DO)**
 
-##Solution architecture
+## Solution architecture 
+
 Have a look at the diagram below:
 
 ![](assets/TFM-demo.png)
 
 
-##Dependencies & prerequisites
+## Dependencies & prerequisites  
+
 The solution requires the following resources to be available:
 - One storage account, with blob container is required to store Terraform state file. In the solution this is present in cgnn23-tfm-rg. 
   This resource should be created manually before the initial run of the Infrastructure Pipeline as the Terraform backstage configuration relies on it.
   (see ![](providers.tf))
   Using a shared remote location for management of state file is one of the best practices of team development with Terraform.   
 
-##Deploymnet process
+## Deploymnet process 
+
 There are two yaml pipelines created on Azure DevOps: 
 - Infrastructure pipeline, which uses Terraform extension to connect and create all resources on Azure, in the main resource group: cgnn23-rg
 - Application CI/CD pipeline, which uses the code from forked "python-sample-vscode-flask-tutorial" to build and push it to Container Registry
 
-###Infrastructure deployment
+### Infrastructure deployment  
+
 The Infrastructure Pipeline uses Terraform and azurerm provider to create the following resources:
 __1. ResourceGroup__
 - The cgnn23-rg resource group contains all resources 
@@ -63,14 +74,15 @@ Definitions included in the FunctionApp Terraform module: ./FunctionApp
 The pipeline definition is present in ![](./azure-pipelines-1.yml). 
 It can be executed via Azure DevOps and requires Terraform extension to be installed there and a Service Connection to Azure Resource Manager scoped for Subscription added to the Azure DevOps Project Settings. 
 To deploy the infrastructure create/ go to the Azure DevOps pipeline !["Terraform init and apply pipeline"](https://dev.azure.com/tuz-azuretests/NN23%20DAP%20Test%20Assignment/_build?definitionId=34) and trigger it manualy. 
-At the moment event-baed triggers are disabled. 
+At the moment event-based triggers are disabled. 
 
 
-###Application code deployment 
+### Application code deployment   
 
 
 
-##Troubleshooting
+## Troubleshooting  
+
 - The ApplyJob of the Infrastructure Pipeline may fail if the Azure DevOps Service Connection identity principal doesn't have the RBAC management permissions (only required for creating azurerm_role_assignment resource). Alternatively you can apply this resource from your local Terraform instance, when authenticated with the Subscription "Owner" identity. 
 - The FunctionApp takes a couple minute to pull the image from ContainerRegistry and start up the container. Be patient. You can monitor the progress in the "Deployment / Logs" section of the FunctionApp in Azure Portal. 
 - Make sure that the FunctionApp application setting "WEBSITES_PORT" (in our solution = 5000 ) matches the port number exposed by Docker in the Application code (check the ![Dockerfile](https://github.com/tuzzoo/python-sample-vscode-flask-tutorial/blob/main/Dockerfile) section:
