@@ -1,4 +1,5 @@
 # Terraform assignment for NN 
+
 Azure Function App from a Docker container, from Python/Linux, deployed with Terraform
 
 - [Terraform assignment for NN](#home)
@@ -11,6 +12,7 @@ Azure Function App from a Docker container, from Python/Linux, deployed with Ter
 ## Assignment 
 
 Here are is a short summary of the assignment and status of each task:
+
 -1. Write a terraform code that will:
   -  Create an Azure Container Registry  **(DONE)**
   -  Create a Function App that will run a Docker container   **(DONE)**
