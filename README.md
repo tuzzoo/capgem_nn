@@ -98,7 +98,9 @@ See Terraform module: ```./ApServicePlan```
 
 ## Troubleshooting  
 
-- The ApplyJob of the Infrastructure Pipeline may fail if the Azure DevOps Service Connection identity principal doesn't have the RBAC management permissions (only required for creating azurerm_role_assignment resource). Alternatively you can apply this resource from your local Terraform instance, when authenticated with the Subscription "Owner" identity. 
+- The ApplyJob of the Infrastructure Pipeline may fail if the Azure DevOps Service Connection identity service principal doesn't have the RBAC management permissions (only required for creating azurerm_role_assignment resource). When setting up Service Connections for your Azure DevOps project (Project Settings > Service Connections) for your pipeline, make sure to assign the "RBAC Access Control Administrator" role for the Service Principal matching your ADO Service Connection. You can do that via Azure Portal and scope it to your subscription, but then apply customization to limit the assignment just to "AcrPull" role. 
+
+   
 - The FunctionApp takes a couple minute to pull the image from ContainerRegistry and start up the container. Be patient. You can monitor the progress in the "Deployment / Logs" section of the FunctionApp in Azure Portal. 
 - Make sure that the FunctionApp application setting "WEBSITES_PORT" (in our solution = 5000 ) matches the port number exposed by Docker in the Application code (check the ![Dockerfile](https://github.com/tuzzoo/python-sample-vscode-flask-tutorial/blob/main/Dockerfile) section:
 
