@@ -75,8 +75,7 @@ There are two yaml pipelines created on Azure DevOps:
 - The pipeline definition is present in [azure-pipelines-1.yml](./azure-pipelines-1.yml). 
 - It can be executed via Azure DevOps. 
 To deploy the infrastructure go to the Azure DevOps project, go to Pipelines and select the pipeline named ["Terraform init and apply pipeline"](https://dev.azure.com/tuz-azuretests/NN23%20DAP%20Test%20Assignment/_build?definitionId=34) and trigger a new run manualy (at the moment all event-based code repository triggers are disabled on purpose). 
-When all resources are successfully deployed you should see something like this in Azure portal , cgnn23-rg Resource Group:
-![](AZ-resources.png)
+
 - When the pipeline jobs complete, you should see all resources created in Azure (see illustration below).
 ![](./assets/AZ-resources.png)
 
@@ -119,16 +118,22 @@ __5. Azure App Service Plan__
 
 
 ### Application code deployment   
-- The Application CI/CD Pipeline uses a standard Azure DevOps Pipelines runner to build a Docker image and upload it to Container Registry (the one created earlier on Azure).
-- Connection to the Container Registry is using system managed identity and needs to be re-established manually after the container registry is created (or re-created).  
-- The pipeline definition is present in [azure-pipelines-1.yml](./azure-pipelines-1.yml). 
-- It can be executed via Azure DevOps. 
-To deploy the infrastructure go to the Azure DevOps project, go to Pipelines and select the pipeline named ["Terraform init and apply pipeline"](https://dev.azure.com/tuz-azuretests/NN23%20DAP%20Test%20Assignment/_build?definitionId=34) and trigger a new run manualy (at the moment all event-based code repository triggers are disabled on purpose). 
-When all resources are successfully deployed you should see something like this in Azure portal , cgnn23-rg Resource Group:
-![](AZ-resources.png)
-- When the pipeline jobs complete, you should see all resources created in Azure (see illustration below).
-![](./assets/AZ-resources.png)
 
+- The Application CI/CD Pipeline is a standard Azure DevOps Pipelines. It uses a template to build a Docker image and upload it to Container Registry (the one created earlier on Azure). It can be created after the infrastructure is in place.
+- Connection to the Container Registry is using system managed identity and needs to be re-established manually after the container registry is created (or re-created).  
+- The pipeline definition is present in [azure-pipelines.yml](https://github.com/tuzzoo/python-sample-vscode-flask-tutorial/blob/main/azure-pipelines-9.yml). 
+
+- Go to [Azure DevOps Pipelines](https://dev.azure.com/tuz-azuretests/NN23%20DAP%20Test%20Assignment/_build) to create, run (or re-run the pipeline manualy, if event-based code repository triggers are disabled).
+![](./assets/ADO-AppJob.png)
+
+- When the pipeline job completes, you should see a new repository added to the Container Registry created in Azure (see illustration below).
+![](./assets/AZ-ContRegistry.png)
+
+- Soon after the Container Registry update should be noticed by the AppFunction and the new image would be pulled automatically. 
+![](./assets/AZ-ImgPull.png)
+
+- AppFunction would restart and as soon as the new container instance is ready you should be able to access the updated version of your Application:
+![](./assets/WebApp.png)
 
 ## Troubleshooting  
 
