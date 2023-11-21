@@ -74,17 +74,20 @@ There are two yaml pipelines created on Azure DevOps:
 
 - The pipeline definition is present in [azure-pipelines-1.yml](./azure-pipelines-1.yml). 
 - It can be executed via Azure DevOps. 
-To deploy the infrastructure create/ go to the Azure DevOps project, go to Pipelines and select the pipeline named ["Terraform init and apply pipeline"](https://dev.azure.com/tuz-azuretests/NN23%20DAP%20Test%20Assignment/_build?definitionId=34) and trigger a new run manualy (at the moment all event-based code repository triggers are disabled on purpose). 
+To deploy the infrastructure go to the Azure DevOps project, go to Pipelines and select the pipeline named ["Terraform init and apply pipeline"](https://dev.azure.com/tuz-azuretests/NN23%20DAP%20Test%20Assignment/_build?definitionId=34) and trigger a new run manualy (at the moment all event-based code repository triggers are disabled on purpose). 
 When all resources are successfully deployed you should see something like this in Azure portal , cgnn23-rg Resource Group:
 ![](AZ-resources.png)
+- When the pipeline jobs complete, you should see all resources created in Azure (see illustration below).
+![](./assets/AZ-resources.png)
 
+### Terraform resources ###
 
 Terraform and azurerm provider to create the following resources:
 
 __1. ResourceGroup__
 
 * See Terraform module:  ```[./ResourceGroup]```
-* The _cgnn23-rg_ resource group contains all resources 
+* The _cgnn23-rg_ resource group contains all resources created.
 
  __2. Function App__
 
@@ -103,20 +106,28 @@ __3. Azure Container Registry__
 
 __4. Azure Storage Account__
 
-See Terraform module: ```./StorageAccount```
+- See Terraform module: ```./StorageAccount```
 - The StorageAccount is required by FunctionApp to keep application files and logs.
 
 __5. Azure App Service Plan__
 
-See Terraform module: ```./ApServicePlan```
-- The AppServicePlan module creates a service plan required by the FunctionApp
+- See Terraform module: ```./AppServicePlan```
+- The AppServicePlan module creates a service plan (resources to manage container instances) required by the FunctionApp.
 
 
 
 
 
 ### Application code deployment   
-
+- The Application CI/CD Pipeline uses a standard Azure DevOps Pipelines runner to build a Docker image and upload it to Container Registry (the one created earlier on Azure).
+- Connection to the Container Registry is using system managed identity and needs to be re-established manually after the container registry is created (or re-created).  
+- The pipeline definition is present in [azure-pipelines-1.yml](./azure-pipelines-1.yml). 
+- It can be executed via Azure DevOps. 
+To deploy the infrastructure go to the Azure DevOps project, go to Pipelines and select the pipeline named ["Terraform init and apply pipeline"](https://dev.azure.com/tuz-azuretests/NN23%20DAP%20Test%20Assignment/_build?definitionId=34) and trigger a new run manualy (at the moment all event-based code repository triggers are disabled on purpose). 
+When all resources are successfully deployed you should see something like this in Azure portal , cgnn23-rg Resource Group:
+![](AZ-resources.png)
+- When the pipeline jobs complete, you should see all resources created in Azure (see illustration below).
+![](./assets/AZ-resources.png)
 
 
 ## Troubleshooting  
