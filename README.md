@@ -13,12 +13,14 @@ Azure Function App from a Docker container, from Python/Linux, deployed with Ter
 
 Here are is a short summary of the assignment and status of each task:
 
--1. Write a terraform code that will:
+___1. Write a terraform code that will:
+
   -  Create an Azure Container Registry  **(DONE)**
   -  Create a Function App that will run a Docker container   **(DONE)**
   -  Integrate the Function App with the Azure Container Registry as the source of deployment   **(DONE)**
--2. Create a pipeline to build the image and push it to the Azure Container Registry   **(DONE)**
--3. Create an infrastructure pipeline to provision Azure resources from Terraform code.  **(DONE)**
+    
+___2. Create a pipeline to build the image and push it to the Azure Container Registry   **(DONE)**
+___3. Create an infrastructure pipeline to provision Azure resources from Terraform code.  **(DONE)**
 
 __Remarks__
 
@@ -45,7 +47,7 @@ Have a look at the diagram below:
 The solution requires the following resources to be available:
 - One storage account, with blob container is required to store Terraform state file. In the solution this is present in cgnn23-tfm-rg. 
   This resource should be created manually before the initial run of the Infrastructure Pipeline as the Terraform backstage configuration relies on it.
-  (see ![](providers.tf))
+  (see !(providers.tf))
   Using a shared remote location for management of state file is one of the best practices of team development with Terraform.   
 
 ## Deploymnet process 
@@ -78,7 +80,7 @@ Definitions included in the FunctionApp Terraform module: ```./FunctionApp```
 - FunctionApp System Identity is assigned the "AcrPull" role on the ContainerRegistry, so that it can pull application images from the registry. 
 
 
-The pipeline definition is present in ![](./azure-pipelines-1.yml). 
+The pipeline definition is present in !(./azure-pipelines-1.yml). 
 It can be executed via Azure DevOps and requires Terraform extension to be installed there and a Service Connection to Azure Resource Manager scoped for Subscription added to the Azure DevOps Project Settings. 
 To deploy the infrastructure create/ go to the Azure DevOps pipeline !["Terraform init and apply pipeline"](https://dev.azure.com/tuz-azuretests/NN23%20DAP%20Test%20Assignment/_build?definitionId=34) and trigger it manualy. 
 At the moment event-based triggers are disabled. 
@@ -100,9 +102,12 @@ See Terraform module: ```./ApServicePlan```
 
 ## Troubleshooting  
 
+### Azure DevOps Pipelines
+
 - The ApplyJob of the Infrastructure Pipeline may fail if the Azure DevOps Service Connection identity service principal doesn't have the RBAC management permissions (only required for creating azurerm_role_assignment resource). When setting up Service Connections for your Azure DevOps project (Project Settings > Service Connections) for your pipeline, make sure to assign the "RBAC Access Control Administrator" role for the Service Principal matching your ADO Service Connection. You can do that via Azure Portal and scope it to your subscription, but then apply customization to limit the assignment just to "AcrPull" role. 
 
-   
+### Azure   
+
 - The FunctionApp takes a couple minute to pull the image from ContainerRegistry and start up the container. Be patient. You can monitor the progress in the "Deployment / Logs" section of the FunctionApp in Azure Portal. 
 - Make sure that the FunctionApp application setting "WEBSITES_PORT" (in our solution = 5000 ) matches the port number exposed by Docker in the Application code (check the ![Dockerfile](https://github.com/tuzzoo/python-sample-vscode-flask-tutorial/blob/main/Dockerfile) section:
 
@@ -116,3 +121,8 @@ See Terraform module: ```./ApServicePlan```
 ENV LISTEN_PORT=5000
 EXPOSE 5000
 ```
+- You can access the deployment logs via the "Deployment" section of your FunctionApp resource in Azure Portal (see below). This gives you a good idea of what happens in the background.
+![](assets/AZ-DeploymentLogs.png)
+  
+- For more advanced exploration of the virtual environment where your FunctionApp runs, you can use "Development Tools". Depending on your AppServicePlan SKU you may just have console or a full set of Kudu tools (see below). 
+![](assets/AZ-Kudu.png)
