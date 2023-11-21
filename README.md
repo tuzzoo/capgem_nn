@@ -13,14 +13,13 @@ Azure Function App from a Docker container, from Python/Linux, deployed with Ter
 
 Here are is a short summary of the assignment and status of each task:
 
-___1. Write a terraform code that will:
-
+ 1. Write a terraform code that will:
   -  Create an Azure Container Registry  **(DONE)**
   -  Create a Function App that will run a Docker container   **(DONE)**
   -  Integrate the Function App with the Azure Container Registry as the source of deployment   **(DONE)**
     
-___2. Create a pipeline to build the image and push it to the Azure Container Registry   **(DONE)**
-___3. Create an infrastructure pipeline to provision Azure resources from Terraform code.  **(DONE)**
+ 2. Create a pipeline to build the image and push it to the Azure Container Registry   **(DONE)**
+ 3. Create an infrastructure pipeline to provision Azure resources from Terraform code.  **(DONE)**
 
 __Remarks__
 
@@ -45,45 +44,62 @@ Have a look at the diagram below:
 ## Dependencies & prerequisites  
 
 The solution requires the following resources to be available:
-- One storage account, with blob container is required to store Terraform state file. In the solution this is present in cgnn23-tfm-rg. 
-  This resource should be created manually before the initial run of the Infrastructure Pipeline as the Terraform backstage configuration relies on it.
-  (see !(providers.tf))
-  Using a shared remote location for management of state file is one of the best practices of team development with Terraform.   
+- **Github** with two repositories - one to host Infrastructure Pipeline code and the other to host Application code.
+In the solution I'm using my own repositories, both made public:
+* [https://github.com/tuzzoo/capgem_nn](https://github.com/tuzzoo/capgem_nn) - created for the assignment and hosting Terraform code and Infrastructure Pipeline
+* [https://github.com/tuzzoo/python-sample-vscode-flask-tutorial](https://github.com/tuzzoo/python-sample-vscode-flask-tutorial) - fork of the original python-flask tutorial, hosting the ApplicationCode and Application CI/CD Pipeline
 
-## Deploymnet process 
+- **Azure subscription** and administrative access to it. 
+In the solution I'm using my private Azure subscription. 
+
+- A resource group and storage account, with blob container is required to store Terraform state file. 
+  In the solution this is present in [cgnn23-tfm-rg](https://portal.azure.com/#@44Forward.onmicrosoft.com/resource/subscriptions/3fb64972-5390-4b5d-8a12-e26109856b96/resourceGroups/cgnn23-tfm-rg/overview). 
+  This resource should be created manually before the initial run of the Infrastructure Pipeline. 
+  This is required to support Terraform remote statefile. See backstage configuration in [providers.tf](providers.tf).
+  Using a shared remote location for management of state file is one of the best practices of team development with Terraform.  
+
+- **Azure DevOps** project. In the solution I'm using my private ADO project [NN23 DAP Test Assignment](https://dev.azure.com/tuz-azuretests/NN23%20DAP%20Test%20Assignment). It has the Terraform plugin installed and required setup of connections to Azure Subscription and the Container Registry - all based on system managed service principles.
+
+
+
+## Deployment process 
 
 There are two yaml pipelines created on Azure DevOps: 
-- Infrastructure pipeline, which uses Terraform extension to connect and create all resources on Azure, in the main resource group: cgnn23-rg
-- Application CI/CD pipeline, which uses the code from forked "python-sample-vscode-flask-tutorial" to build and push it to Container Registry
+- **Infrastructure pipeline**, which uses Terraform extension to connect and create all resources on Azure, in the main resource group: cgnn23-rg
+- **Application CI/CD pipeline**, which uses the code from forked "python-sample-vscode-flask-tutorial" to build a Docker image and push it to Container Registry
 
 ### Infrastructure deployment  
 
-The Infrastructure Pipeline uses Terraform and azurerm provider to create the following resources:
+- The Infrastructure Pipeline uses Terraform and azurerm provider to create resources on Azure.
+
+- The pipeline definition is present in [azure-pipelines-1.yml](./azure-pipelines-1.yml). 
+- It can be executed via Azure DevOps. 
+To deploy the infrastructure create/ go to the Azure DevOps project, go to Pipelines and select the pipeline named ["Terraform init and apply pipeline"](https://dev.azure.com/tuz-azuretests/NN23%20DAP%20Test%20Assignment/_build?definitionId=34) and trigger a new run manualy (at the moment all event-based code repository triggers are disabled on purpose). 
+When all resources are successfully deployed you should see something like this in Azure portal , cgnn23-rg Resource Group:
+![](AZ-resources.png)
+
+
+Terraform and azurerm provider to create the following resources:
 
 __1. ResourceGroup__
 
-See Terraform module: ```./ResourceGroup```
-- The cgnn23-rg resource group contains all resources 
+* See Terraform module:  ```[./ResourceGroup]```
+* The _cgnn23-rg_ resource group contains all resources 
 
-__2. Function App__
+ __2. Function App__
 
-See FunctionApp Terraform module: ```./FunctionApp```
-- The Function App is running the application as container pulled from ContainerRegistry
-- Function App is using System Identity to connect to the ContainerRegistry and StorageAccount (file share)
-- "Continuous Deployment" option is enabled on the FunctionApp, and it listens to events through a Webhook
-- Webhook is used to trigger Funtion App refresh whenever new image version is pushed to the ContainerRegistry
+* See FunctionApp Terraform module: ```./FunctionApp```
+* The Function App is running the application as container pulled from ContainerRegistry
+* Function App is using System Identity to connect to the ContainerRegistry and StorageAccount (file share)
+* "Continuous Deployment" option is enabled on the FunctionApp, and it listens to events through a Webhook
+* Webhook is used to trigger Funtion App refresh whenever new image version is pushed to the ContainerRegistry
 
 __3. Azure Container Registry__
 
-Definitions included in the FunctionApp Terraform module: ```./FunctionApp```
+- Container registry resource definitions are included in the FunctionApp Terraform module: ```./FunctionApp```
+
 - The ContainerRegistry is holding images of the application code - the results of build & deployment process implemented in the Application CI/CD Pipeline
 - FunctionApp System Identity is assigned the "AcrPull" role on the ContainerRegistry, so that it can pull application images from the registry. 
-
-
-The pipeline definition is present in !(./azure-pipelines-1.yml). 
-It can be executed via Azure DevOps and requires Terraform extension to be installed there and a Service Connection to Azure Resource Manager scoped for Subscription added to the Azure DevOps Project Settings. 
-To deploy the infrastructure create/ go to the Azure DevOps pipeline !["Terraform init and apply pipeline"](https://dev.azure.com/tuz-azuretests/NN23%20DAP%20Test%20Assignment/_build?definitionId=34) and trigger it manualy. 
-At the moment event-based triggers are disabled. 
 
 __4. Azure Storage Account__
 
@@ -94,6 +110,9 @@ __5. Azure App Service Plan__
 
 See Terraform module: ```./ApServicePlan```
 - The AppServicePlan module creates a service plan required by the FunctionApp
+
+
+
 
 
 ### Application code deployment   
